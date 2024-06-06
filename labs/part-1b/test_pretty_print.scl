@@ -1,0 +1,5 @@
+import "scene_graph.scl"
+
+const MY_QUERY = Exists(FilterColor(FilterShape(Scene(), SPHERE), RED))
+
+query query_to_string(MY_QUERY, s)

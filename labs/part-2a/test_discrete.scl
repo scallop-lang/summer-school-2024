@@ -1,0 +1,7 @@
+import "hwf.scl"
+
+rel symbol = { (0, "1"), (1, "*"), (2, "8") }
+
+rel length(3)
+
+query result

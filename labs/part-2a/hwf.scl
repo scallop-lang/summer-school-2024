@@ -1,0 +1,44 @@
+type symbol(index: usize, symbol: String)
+type length(n: usize)
+
+rel digit = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+
+// =========== YOUR CODE START HERE ===========
+
+// ** Problem 1: term **
+//
+// A term is a digit of 0-9
+//
+// > TERM := 0 | ... | 9
+//
+type term(value: f32, begin: usize, end: usize)
+/* YOUR CODE HERE */
+
+// ** Problem 2: mult_div **
+//
+// A mult_div expression is a multiplication/division expression
+//
+// > MULT_DIV := TERM
+// >           | MULT_DIV * TERM
+// >           | MULT_DIV / TERM
+type mult_div(value: f32, begin: usize, end: usize)
+/* YOUR CODE HERE */
+
+// ** Problem 3: add_minus **
+//
+// An add_minus expression is a addition/subtraction expression
+//
+// > ADD_MINUS := MULT_DIV
+// >            | ADD_MINUS + MULT_DIV
+// >            | ADD_MINUS - MULT_DIV
+type add_minus(value: f32, begin: usize, end: usize)
+/* YOUR CODE HERE */
+
+// ** Problem 4: result **
+//
+// `value` is the final result of evaluating the expression
+// it should make use of the `add_minus` relation defined above
+type result(value: f32)
+/* YOUR CODE HERE */
+
+// =========== YOUR CODE END HERE ===========

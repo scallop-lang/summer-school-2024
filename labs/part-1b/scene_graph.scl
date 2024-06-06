@@ -1,0 +1,86 @@
+// ======== Basic Definitions of Operation Domains ========
+
+// Value type definitions and constants
+type Object = String
+type Color = RED | YELLOW | BLUE
+type Shape = CUBE | SPHERE
+type Relation = LEFT | RIGHT
+
+// To string relations for color, shape, and spatial relations
+rel color_to_string = {(RED, "red"), (YELLOW, "yellow"), (BLUE, "blue")}
+rel shape_to_string = {(CUBE, "cube"), (SPHERE, "sphere")}
+rel relation_to_string = {(LEFT, "left"), (RIGHT, "right")}
+
+// Type definition of scene graph relations
+type object(obj: Object)
+type obj_color(obj: Object, color: Color)
+type obj_shape(obj: Object, shape: Shape)
+type obj_relation(obj1: Object, obj2: Object, rela: Relation)
+
+// ======== Our Sample Scene Graph ========
+
+// Helper constants for the 4 objects
+const A = "A", B = "B", C = "C", D = "D"
+rel object = { A, B, C, D }
+
+// ** Practice 1: please complete the probabilistic scene graph **
+//
+// You can do so by filling in facts corresponding to the provided image
+// Hint: for probabilistic facts, you can use the `PROBABILITY :: TUPLE` syntax
+rel obj_color = { /* YOUR CODE HERE: fill in probabilistic facts of colors */ }
+rel obj_shape = { /* YOUR CODE HERE: fill in probabilistic facts of shapes */ }
+
+// Spatial relationships (LEFT only) between objects
+rel obj_relation = {
+  (A, B, LEFT), (A, C, LEFT), (A, D, LEFT),
+  (B, C, LEFT), (B, D, LEFT),
+  (C, D, LEFT),
+}
+
+// If b is on the left of a, then a is on the right of b
+rel obj_relation(a, b, RIGHT) = obj_relation(b, a, LEFT)
+
+// ======== Scene Graph Query Language ========
+
+// The abstract syntax tree for `Query`
+type Query = Scene()
+           | FilterColor(Query, Color)
+           | FilterShape(Query, Shape)
+           | FilterRelate(Query, Relation)
+           | Count(Query)
+           | Exists(Query)
+
+// ======== Pretty-Printing SGQL ========
+
+// Pretty-printing Queries
+rel query_to_string(e, $format("Count({})", eps)) = case e is Count(ep) and query_to_string(ep, eps)
+rel query_to_string(e, $format("Exists({})", eps)) = case e is Exists(ep) and query_to_string(ep, eps)
+
+rel query_to_string(e, "Scene()") = case e is Scene()
+rel query_to_string(e, $format("FilterColor({}, {})", eps, cs)) = case e is FilterColor(ep, c) and query_to_string(ep, eps) and color_to_string(c, cs)
+
+// ** Practice 2: please complete the query pretty-printer **
+//
+// Please write two rules for `query_to_string` relation that
+// handle the case of `FilterShape` and `FilterRelate`
+
+/* YOUR CODE HERE */
+
+// ======== Evaluating SGQL ========
+
+// The evaluator of SGQL
+@demand("bf")
+type result(e: Query, r: String)
+rel result(e, n as String) = eval_num(e, n)
+rel result(e, b as String) = eval_bool(e, b)
+rel eval_num(e, n) = n := count(o: eval_obj(ep, o) where e: case e is Count(ep))
+rel eval_bool(e, b) = b := exists(o: eval_obj(ep, o) where e: case e is Exists(ep))
+rel eval_obj(e, o) = case e is Scene() and object(o)
+rel eval_obj(e, o) = case e is FilterColor(ep, c) and eval_obj(ep, o) and obj_color(o, c)
+
+// ** Practice 3: please complete the query evaluator **
+//
+// Please write two rules for `eval_obj` relation that
+// handle the case of `FilterShape` and `FilterRelate`
+
+/* YOUR CODE HERE */

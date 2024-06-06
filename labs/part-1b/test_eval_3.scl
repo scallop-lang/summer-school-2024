@@ -1,0 +1,7 @@
+import "scene_graph.scl"
+
+// Does there exists a red cube in the scene?
+const MY_QUERY = Exists(FilterColor(FilterShape(Scene(), CUBE), RED))
+
+query query_to_string(MY_QUERY, s)
+query result(MY_QUERY, r)

@@ -1,0 +1,63 @@
+// Basic typing setup
+type node(id: usize)
+type edge(from_id: usize, to_id: usize)
+
+// Practice 1: Setup the basic facts that resembles the sample graph
+rel node = {/* YOUR CODE HERE: Fill in the facts here */}
+rel edge = {/* YOUR CODE HERE: Fill in the facts here */}
+
+// Practice 2: Find the triangle in this graph
+//   Definition: `triangle(a, b, c)` means the nodes a, b, and c form a triangle
+type triangle(a: usize, b: usize, c: usize)
+/* YOUR CODE HERE */
+
+// Practice 3: Write a `path` relationship
+//   Definition: `path(a, b)` is true if a can reach b by following edges
+type path(from_id: usize, to_id: usize)
+/* YOUR CODE HERE */
+
+// Practice 4: Write an `scc` relationship
+//   Definition: `scc(a, b)` means node `a` and `b` are in the same Strongly Connected Component
+//   Definition: Strongly Connected Component is a subgraph where any node can reach every node in such a component
+//   Note: A node is always in the same Strongly Connected Component as itself
+type scc(a: usize, b: usize)
+/* YOUR CODE HERE */
+
+// Practice 5: Check if a node is a source node or a sink node
+//   Definition: A node is a source if there is only outgoing edge
+//   Definition: A node is a sink if there is only incoming edge
+type source_node(node_id: usize)
+/* YOUR CODE HERE */
+type sink_node(node_id: usize)
+/* YOUR CODE HERE */
+
+// Practice 6: Does this graph contains at least cycle?
+//   Definition: `contains_cycle(true)` means the graph contains a cycle. false otherwise
+type contains_cycle(bool)
+/* YOUR CODE HERE */
+
+// Practice 7: Count the number of nodes
+//   Definition: `num_nodes(n)` means there are in total `n` nodes in the graph
+type num_nodes(n: usize)
+/* YOUR CODE HERE */
+
+// Practice 8: Count the number of nodes
+//   Definition: `num_nodes(m)` means there are in total `m` nodes in the graph
+type num_edges(m: usize)
+/* YOUR CODE HERE */
+
+// Practice 9: Write a `in_degree` relationship
+//   Definition: `in_degree(a, x)` means there are `x` edges going into node `a`
+type in_degree(node: usize, degree: usize)
+/* YOUR CODE HERE */
+
+// Practice 9: Write a `out_degree` relationship
+//   Definition: `out_degree(a, x)` means there are `x` edges going out from node `a`
+type out_degree(node: usize, degree: usize)
+/* YOUR CODE HERE */
+
+// Extra Credit 1: Shortest Path Length
+//   Definition: shortest_path_length(a, b, n): n is the length of the shortest path between node `a` and `b`
+//   Note: Need to use the fact that any path length will be less than or equal to the total number of nodes in the graph
+type shortest_path_length(from_node: usize, to_node: usize, length: usize)
+/* YOUR CODE HERE */
