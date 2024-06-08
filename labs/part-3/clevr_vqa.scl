@@ -33,10 +33,14 @@ type vit_segment_image(
 @clip(["cube", "cylinder", "sphere"], prompt="a {{}} shaped object", debug=true)
 type classify_shape(bound img: Tensor, color: String)
 
-@clip(["red", "blue", "yellow", "green"], prompt="a {{}} colored object", debug=true)
+// TODO: Write the @clip declarations for the below relations
+// Color choices:     red, blue, yellow, green
+// Material choices:  shiny metal, solid rubber
+
+/* YOUR CODE HERE */
 type classify_color(bound img: Tensor, color: String)
 
-@clip(["shiny metal", "solid rubber"], prompt="an object made out of {{}} material", debug=true)
+/* YOUR CODE HERE */
 type classify_material(bound img: Tensor, material: String)
 
 @gpt(
@@ -85,15 +89,13 @@ rel object(obj_id) = obj_id := top<10>(obj_id: object_segment(obj_id, obj_img, _
 
 type Expr = Scene() | FilterShape(Expr, String) | FilterMaterial(Expr, String) | FilterColor(Expr, String) | FilterSize(Expr, String) | Count(Expr) | Exists(Expr) | GreaterThan(Expr, Expr) | LessThan(Expr, Expr) | Equals(Expr, Expr) | And(Expr, Expr) | Or(Expr, Expr) | SameSize(Expr) | SameColor(Expr) | SameMaterial(Expr) | SameShape(Expr)
 
+// TODO: Fill in the eval_obj rules for the following cases:
+//       FilterShape, FilterColor, FilterMaterial, SameShape, SameColor, SameMaterial
 rel eval_obj(e, o) = case e is Scene() and object(o)
-rel eval_obj(e, o) = case e is FilterShape(e1, s) and eval_obj(e1, o) and shape(o, s)
-rel eval_obj(e, o) = case e is FilterColor(e1, c) and eval_obj(e1, o) and color(o, c)
-rel eval_obj(e, o) = case e is FilterMaterial(e1, m) and eval_obj(e1, o) and material(o, m)
 rel eval_obj(e, o) = case e is FilterSize(e1, s) and eval_obj(e1, o) and size(o, s)
 rel eval_obj(e, p) = case e is SameSize(e1) and eval_obj(e1, o) and size(o, s) and size(p, s) and o != p
-rel eval_obj(e, p) = case e is SameColor(e1) and eval_obj(e1, o) and color(o, c) and color(p, c) and o != p
-rel eval_obj(e, p) = case e is SameMaterial(e1) and eval_obj(e1, o) and material(o, m) and material(p, m) and o != p
-rel eval_obj(e, p) = case e is SameShape(e1) and eval_obj(e1, o) and shape(o, s) and shape(p, s) and o != p
+/* YOUR CODE HERE */
+
 rel eval_num(e, n) = n := count(o: eval_obj(e1, o) where e: case e is Count(e1))
 rel eval_bool(e, b) = b := exists(o: eval_obj(e1, o) where e: case e is Exists(e1))
 rel eval_bool(e, n1 > n2) = eval_num(e1, n1), eval_num(e2, n2), case e is GreaterThan(e1,e2)

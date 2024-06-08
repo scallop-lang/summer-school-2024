@@ -1,6 +1,14 @@
 // Input; a question
-@cmd_arg("--question", default="Jane finished her PhD in January 5th, 2008. Today is the 10th anniversary. What is the date 10 days ago?")
+// See https://github.com/google/BIG-bench/tree/main/bigbench/benchmark_tasks/date_understanding for more examples
+@cmd_arg("--question", default="Jane finished her PhD in January 5th, 2008. 2 days from today is the 10th anniversary of her PhD. What is the date 10 days ago from today?")
 type question(question: String)
+
+// Test whether GPT-4 alone can answer the question
+// Answer to default question should be: 12/24/2017
+@gpt(prompt="{{prompt}} {{res}}", model="gpt-4", debug=true)
+type gpt_prompt(bound prompt: String, res: String)
+rel gpt_ans(a) = question(q), gpt_prompt(q, a)
+query gpt_ans
 
 // Query foundation model
 @gpt_extract_info(
@@ -53,22 +61,21 @@ type question(question: String)
     )
   ],
   model="gpt-4",
-  cot=[false,false,true],
   debug=true,
 )
 type extract_mentioned_date(bound question: String, label: String, date: DateTime),
      extract_goal          (bound question: String, goal: String),
      extract_relationship  (bound question: String, earlier_date: String, later_date: String, diff: Duration)
 
-// Extract information from the question
+// Extract information from the question as relations
 rel mentioned_date(label, date) = question(question) and extract_mentioned_date(question, label, date)
 rel relationship(l1, l2, diff)  = question(question) and extract_relationship(question, l1, l2, diff)
 rel goal(label)                 = question(question) and extract_goal(question, label)
 
-// Do computation
-rel derived_date(label, date)        = mentioned_date(label, date)
-rel derived_date(label, date - diff) = relationship(label, other, diff) and derived_date(other, date)
-rel derived_date(label, date + diff) = relationship(other, label, diff) and derived_date(other, date)
+// TODO: Fill in the rules for computing derived_dates from mentioned_dates
+// Hint: Use the "relationship" relation
+type derived_date(label: String, date: DateTime)
+/* YOUR CODE HERE */
 
 // Get the answer corresponding to the goal
 rel answer(date) = goal(label) and derived_date(label, date)
