@@ -6,8 +6,8 @@ type question(question: String)
 // Test whether GPT-4 alone can answer the question
 // Answer to default question should be: 12/24/2017
 @gpt(prompt="{{prompt}} {{res}}", model="gpt-4", debug=true)
-type gpt_prompt(bound prompt: String, res: String)
-rel gpt_ans(a) = question(q), gpt_prompt(q, a)
+type gpt4(bound prompt: String, res: String)
+rel gpt_ans(a) = question(q), gpt4(q, a)
 query gpt_ans
 
 // Query foundation model

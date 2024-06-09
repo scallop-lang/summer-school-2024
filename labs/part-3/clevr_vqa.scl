@@ -96,13 +96,12 @@ rel eval_obj(e, o) = case e is FilterSize(e1, s) and eval_obj(e1, o) and size(o,
 rel eval_obj(e, p) = case e is SameSize(e1) and eval_obj(e1, o) and size(o, s) and size(p, s) and o != p
 /* YOUR CODE HERE */
 
+// TODO: Fill in the eval_bool rules for the following cases (eval_num is completed for you):
+//       Exists, GreaterThan, LessThan, Equals, And, Or
+// Hint: GreaterThan, LessThan, Equals are operations on nums; And, Or are operations on bools
 rel eval_num(e, n) = n := count(o: eval_obj(e1, o) where e: case e is Count(e1))
-rel eval_bool(e, b) = b := exists(o: eval_obj(e1, o) where e: case e is Exists(e1))
-rel eval_bool(e, n1 > n2) = eval_num(e1, n1), eval_num(e2, n2), case e is GreaterThan(e1,e2)
-rel eval_bool(e, n1 < n2) = eval_num(e1, n1), eval_num(e2, n2), case e is LessThan(e1,e2)
-rel eval_bool(e, n1 == n2) = eval_num(e1, n1), eval_num(e2, n2), case e is Equals(e1,e2)
-rel eval_bool(e, b1 && b2) = eval_bool(e1, b1), eval_bool(e2,b2), case e is And(e1,e2)
-rel eval_bool(e, b1 || b2) = eval_bool(e1, b1), eval_bool(e2,b2), case e is Or(e1,e2)
+type eval_bool(e: Expr, b: bool)
+/* YOUR CODE HERE */
 
 rel ret_ty(e, "bool") = case e is GreaterThan(_,_) or case e is Exists(_) or case e is LessThan(_, _) or case e is Equals(_,_) or case e is And(_,_) or case e is Or(_,_)
 rel ret_ty(e, "int") = case e is Count(_)
@@ -110,8 +109,9 @@ rel ret_ty(e, "int") = case e is Count(_)
 rel eval_result(e, b as String) = ret_ty(e, "bool") and eval_bool(e, b)
 rel eval_result(e, n as String) = ret_ty(e, "int") and eval_num(e, n)
 
-rel parsed_expr(e) = question(q) and parse_expr(q, e)
-rel result(r) = parsed_expr(e) and eval_result(e, r)
+// TODO: Compute the answer to the question using parse_expr and eval_result
+type result(r: String)
+/* YOUR CODE HERE */
 
 // ==== Get the result ====
 query result

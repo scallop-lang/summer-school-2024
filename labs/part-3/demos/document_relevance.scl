@@ -1,0 +1,32 @@
+// Use OpenAI's embedding API for information retrieval
+@gpt_encoder
+type $embed_text(String) -> Tensor
+
+rel question = {"Which board game was published most recently, Pirate’s Cove or Catan?"}
+
+// Documents for context
+rel context = {
+  (1, "Struggle for Rome is a 2006 German-style board game based on the game mechanics of Settlers of Catan, depicting the fall of the Western Roman Empire"),
+  (2, "The Kids of Catan is a German board game designed for children using the theme from The Settlers of Catan"),
+  (3, "Pirate’s Cove is a board game designed by Paul Randles and Daniel Stahl, originally published in Germany in 2002"),
+  (4, "The Settlers of Catan, sometimes shortened to Catan or Settlers, is a multiplayer board game designed by Klaus Teuber and first published in 1995"),
+  (5, "Elasund: The First City is a German-style board game designed by Klaus Teuber")
+}
+
+// Find the top 2 contexts relevant to the question by comparing text embeddings
+rel relevant(id) = id := top<2>(id: question(q) and context(id, c) and soft_eq<Tensor>($embed_text(q), $embed_text(c)))
+rel relevant_context($string_concat(c1, "\n", c2)) = relevant(id1) and relevant(id2) and id1 < id2 and context(id1, c1) and context(id2, c2)
+
+// Prompt GPT with top 2 contexts and CoT
+@gpt(
+  prompt="Given {{context}}\n{{question}}\nPlease think step-by-step {{answer}}",
+  model="gpt-4",
+)
+type qa(bound question: String, bound context: String, answer: String)
+
+// Get the final answer
+rel answer(a) = question(q) and relevant_context(c) and qa(q, c, a)
+
+// Inspect relations
+query relevant_context
+query answer

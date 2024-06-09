@@ -34,7 +34,7 @@ rel tag_image(0, img) = image(img)
 rel tag_image(id + 1, $tag_image(img, x, y, w, h, name, "green", 10, 32)) = tag_image(id, img), identity(id, name), face_bbox(id, x, y, w, h)
 rel output_image($save_image(img)) = tag_image(n as u32, img), n := count!(id: identity(id, name))
 
-// Upload the image (Scallop is lazy)
+// Save the image (Scallop is lazy)
 query output_image
 
 // Inspect intermediate relations

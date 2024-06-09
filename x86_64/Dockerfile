@@ -14,13 +14,17 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &
     rm ./Miniconda3-latest-Linux-x86_64.sh
 ENV PATH="/root/miniconda3/bin/:${PATH}"
 
-# install scallop
+# Install Scallop
 RUN mkdir /root/packages && \
     mkdir /root/packages/scallop && \
     mkdir /root/packages/scallop/bin && \
     mkdir /root/packages/scallop/lib && \
     mkdir /root/labs
 ENV PATH="/root/packages/scallop/bin:${PATH}"
+
+# Download DSFD model
+RUN curl -L https://api.loke.aws.unit.no/dlr-gui-backend-resources-content/v2/contents/links/61be4ec7-8c11-4a4a-a9f4-827144e4ab4f0c2764c1-80a0-4083-bbfa-68419f889b80e4692358-979b-458e-97da-c1a1660b3314 -o WIDERFace_DSFD_RES152.pth
+RUN mkdir -p /root/.cache/torch/hub/checkpoints && cp WIDERFace_DSFD_RES152.pth /root/.cache/torch/hub/checkpoints/
 
 # Setup conda virtual environment for scallop
 WORKDIR /root/packages/scallop/lib
@@ -56,9 +60,6 @@ RUN source /root/miniconda3/etc/profile.d/conda.sh && \
     python -m pip install tqdm && \
     python -m pip install matplotlib && \
     python -m pip install gym
-
-RUN curl -L https://api.loke.aws.unit.no/dlr-gui-backend-resources-content/v2/contents/links/61be4ec7-8c11-4a4a-a9f4-827144e4ab4f0c2764c1-80a0-4083-bbfa-68419f889b80e4692358-979b-458e-97da-c1a1660b3314 -o WIDERFace_DSFD_RES152.pth
-RUN mkdir -p /root/.cache/torch/hub/checkpoints && cp WIDERFace_DSFD_RES152.pth /root/.cache/torch/hub/checkpoints/
 
 ADD ./labs /root/labs
 ADD ./x86_64/scli /root/packages/scallop/bin/scli
