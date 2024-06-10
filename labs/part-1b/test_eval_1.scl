@@ -1,7 +1,0 @@
-import "scene_graph.scl"
-
-// Count the number of objects in the scene
-const MY_QUERY = Count(Scene())
-
-query query_to_string(MY_QUERY, s)
-query result(MY_QUERY, r)
