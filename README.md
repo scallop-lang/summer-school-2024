@@ -20,3 +20,6 @@ To use OpenAI features, add the following line to the container's `~/.bashrc`:
 ```bash
 export OPENAI_API_KEY="<YOUR_OPENAI_KEY>"
 ```
+
+## Tutorial instructions
+See the [official website](https://www.scallop-lang.org/ssnp24/index.html).
