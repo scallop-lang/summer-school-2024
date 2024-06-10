@@ -4,7 +4,7 @@ rel context = {
   Brian. James took his daughter Sharon to dance practice. Sharon's son Davis is turning nine today, so
   she is throwing him a party. Rick was disappointed that his father, Kent, wouldn't be at the play to
   see him perform. Florence wanted to visit an art museum, so she asked her father, James to take her.
-  Davis and his brother Brian always played pranks on each other Who is Florence to Rick?"
+  Davis and his brother Brian always played pranks on each other. Who is Florence to Rick?"
 }
 
 // Few-shot prompt GPT to extract structured relational data from the natural language question

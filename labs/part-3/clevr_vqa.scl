@@ -111,9 +111,8 @@ rel ret_ty(e, "int") = case e is Count(_)
 rel eval_result(e, b as String) = ret_ty(e, "bool") and eval_bool(e, b)
 rel eval_result(e, n as String) = ret_ty(e, "int") and eval_num(e, n)
 
-// TODO: Compute the answer to the question using parse_expr and eval_result
-type result(r: String)
-/* YOUR CODE HERE */
+rel parsed_expr(e) = question(q) and parse_expr(q, e)
+rel result(r) = parsed_expr(e) and eval_result(e, r)
 
 // ==== Get the result ====
 query result
