@@ -1,0 +1,198 @@
+// Answer: Florence is Rick's aunt
+rel context = {
+  "Kent rushed to the hospital to find out that his wife and already given birth to a boy and had named him
+  Brian. James took his daughter Sharon to dance practice. Sharon's son Davis is turning nine today, so
+  she is throwing him a party. Rick was disappointed that his father, Kent, wouldn't be at the play to
+  see him perform. Florence wanted to visit an art museum, so she asked her father, James to take her.
+  Davis and his brother Brian always played pranks on each other Who is Florence to Rick?"
+}
+
+// Few-shot prompt GPT to extract structured relational data from the natural language question
+// Note that given mentioned kinships and the goal, we can deduce the final answer via a knowledge base of kinship compositions
+@gpt_extract_info(
+  header="Please extract kinships mentioned in the story and the characters whose kinship is desired in the question.",
+  prompts=[
+    "What are the mentioned kinships in JSON format (with `p1`, `p2`, and `rela` fields, denoting `p1` is `p2`'s' `rela`)?",
+    "Whose kinship do we want to find?"
+  ],
+  examples=[
+    (
+      ["Dorothy's brother Michael and her went to get ice cream. Michael is the proud father of the lovely Donald.
+        Who is Dorothy to Donald?"],
+      [
+        [("Michael", "Dorothy", "brother"), ("Dorothy", "Michael", "sister"),
+         ("Michael", "Donald", "father"), ("Donald", "Michael", "son")],
+        [("Dorothy", "Donald")]
+      ]
+    ),
+    (
+      ["Michael and his daughter Jennifer like to read poems together. Jason is the proud father of the lovely Michael.
+        Who is Jason to Jennifer?"],
+      [
+        [("Jennifer", "Michael", "daughter"), ("Michael", "Jennifer", "father"),
+         ("Jason", "Michael", "father"), ("Michael", "Jason", "son")],
+        [("Jason", "Jennifer")]
+      ]
+    ),
+    (
+      ["Kevin loves going to plays with his wife Aida. Aida's dad James, however, does not like them at all.
+        Who is James to Kevin?"],
+      [
+        [("Aida", "Kevin", "wife"), ("Kevin", "Aida", "husband"),
+         ("James", "Aida", "father"), ("Aida", "James", "daughter")],
+        [("James", "Kevin")]
+      ]
+    )
+  ],
+  model="gpt-4",
+)
+type extract_kinship  (bound context: String, p1: String, p2: String, rela: String),
+     extract_question (bound context: String, p1: String, p2: String)
+
+// Extract information from the context
+rel kinship(p1, p2, rela) = context(ctx) and extract_kinship(ctx, p1, p2, rela)
+rel question(p1, p2)      = context(ctx) and extract_question(ctx, p1, p2)
+
+// Knowledge base for composing kinship relations
+rel composition = {
+  ("daughter", "daughter", "granddaughter"),
+  ("daughter", "sister", "daughter"),
+  ("daughter", "son", "grandson"),
+  ("daughter", "aunt", "sister"),
+  ("daughter", "father", "husband"),
+  ("daughter", "husband", "son-in-law"),
+  ("daughter", "brother", "son"),
+  ("daughter", "mother", "wife"),
+  ("daughter", "uncle", "brother"),
+  ("daughter", "grandfather", "father"),
+  ("daughter", "grandfather", "father-in-law"),
+  ("daughter", "grandmother", "mother"),
+  ("daughter", "grandmother", "mother-in-law"),
+  ("sister", "daughter", "niece"),
+  ("sister", "sister", "sister"),
+  ("sister", "son", "nephew"),
+  ("sister", "aunt", "aunt"),
+  ("sister", "father", "father"),
+  ("sister", "brother", "brother"),
+  // ("sister", "nephew", "nephew"),
+  // ("sister", "nephew", "son"),
+  ("sister", "mother", "mother"),
+  ("sister", "uncle", "uncle"),
+  ("sister", "grandfather", "grandfather"),
+  ("sister", "grandmother", "grandmother"),
+  // ("sister", "niece", "niece"),
+  // ("sister", "niece", "daughter"),
+  ("son", "daughter", "granddaughter"),
+  ("son", "sister", "daughter"),
+  ("son", "son", "grandson"),
+  ("son", "aunt", "sister"),
+  ("son", "father", "husband"),
+  ("son", "brother", "son"),
+  ("son", "mother", "wife"),
+  ("son", "uncle", "brother"),
+  ("son", "grandfather", "father"),
+  // ("son", "grandfather", "father-in-law"),
+  ("son", "wife", "daughter-in-law"),
+  ("son", "grandmother", "mother"),
+  // ("son", "grandmother", "mother-in-law"),
+  ("aunt", "sister", "aunt"),
+  ("aunt", "father", "grandfather"),
+  ("aunt", "brother", "uncle"),
+  ("aunt", "mother", "grandmother"),
+  ("father", "daughter", "sister"),
+  ("father", "sister", "aunt"),
+  ("father", "son", "brother"),
+  ("father", "father", "grandfather"),
+  // ("father", "granddaughter", "daughter"),
+  // ("father", "granddaughter", "niece"),
+  ("father", "brother", "uncle"),
+  ("father", "mother", "grandmother"),
+  ("father", "wife", "mother"),
+  ("husband", "daughter", "daughter"),
+  ("husband", "son", "son"),
+  ("husband", "father", "father-in-law"),
+  ("husband", "granddaughter", "granddaughter"),
+  ("husband", "mother", "mother-in-law"),
+  ("husband", "grandson", "grandson"),
+  ("granddaughter", "sister", "granddaughter"),
+  // ("granddaughter", "father", "son"),
+  // ("granddaughter", "father", "son-in-law"),
+  ("granddaughter", "brother", "grandson"),
+  // ("granddaughter", "mother", "daughter"),
+  // ("granddaughter", "mother", "daughter-in-law"),
+  // ("granddaughter", "grandfather", "husband"),
+  // ("granddaughter", "grandmother", "wife"),
+  ("brother", "daughter", "niece"),
+  ("brother", "sister", "sister"),
+  ("brother", "son", "nephew"),
+  ("brother", "aunt", "aunt"),
+  ("brother", "father", "father"),
+  ("brother", "brother", "brother"),
+  // ("brother", "nephew", "nephew"),
+  // ("brother", "nephew", "son"),
+  ("brother", "mother", "mother"),
+  ("brother", "uncle", "uncle"),
+  ("brother", "grandfather", "grandfather"),
+  ("brother", "grandmother", "grandmother"),
+  // 0.8::("brother", "niece", "niece"),
+  // 0.8::("brother", "niece", "daughter"),
+  ("nephew", "sister", "niece"),
+  // ("nephew", "aunt", "wife"),
+  // ("nephew", "aunt", "wife"),
+  // ("nephew", "father", "brother"),
+  ("nephew", "brother", "nephew"),
+  // ("nephew", "mother", "sister"),
+  // ("nephew", "uncle", "brother"),
+  // ("nephew", "uncle", "husband"),
+  // ("nephew", "grandfather", "father"),
+  // ("nephew", "grandmother", "mother"),
+  ("mother", "daughter", "sister"),
+  ("mother", "sister", "aunt"),
+  ("mother", "son", "brother"),
+  ("mother", "father", "grandfather"),
+  ("mother", "husband", "father"),
+  // ("mother", "granddaughter", "daughter"),
+  // ("mother", "granddaughter", "niece"),
+  ("mother", "brother", "uncle"),
+  ("mother", "mother", "grandmother"),
+  // ("mother", "grandson", "son"),
+  // ("mother", "grandson", "nephew"),
+  // ("mother", "son-in-law", "husband"),
+  ("mother", "father-in-law", "grandfather"),
+  // ("mother", "daughter-in-law", "wife"),
+  ("mother", "mother-in-law", "grandmother"),
+  ("uncle", "sister", "aunt"),
+  ("uncle", "father", "grandfather"),
+  ("uncle", "brother", "uncle"),
+  ("uncle", "mother", "grandmother"),
+  // ("grandfather", "daughter", "mother"),
+  // ("grandfather", "daughter", "aunt"),
+  // ("grandfather", "son", "father"),
+  // ("grandfather", "son", "uncle"),
+  ("grandfather", "wife", "grandmother"),
+  ("wife", "daughter", "daughter"),
+  ("wife", "son", "son"),
+  ("wife", "father", "father-in-law"),
+  ("wife", "granddaughter", "granddaughter"),
+  ("wife", "mother", "mother-in-law"),
+  ("wife", "grandson", "grandson"),
+  ("wife", "son-in-law", "son-in-law"),
+  ("wife", "father-in-law", "father"),
+  ("wife", "daughter-in-law", "daughter-in-law"),
+  ("wife", "mother-in-law", "mother"),
+  ("grandmother", "husband", "grandfather"),
+  ("grandson", "sister", "granddaughter"),
+  // ("grandson", "father", "son"),
+  // ("grandson", "father", "son-in-law"),
+  ("grandson", "brother", "grandson"),
+}
+
+// Perform computation on the kinship graph
+rel derived_kinship(p1, p2, rela) = kinship(p1, p2, rela)
+rel derived_kinship(p1, p3, r3)   = p1 != p3 and derived_kinship(p1, p2, r1) and derived_kinship(p2, p3, r2)
+                                    and composition(r2, r1, r3)
+
+// Get the answer
+rel result(r) = question(p1, p2) and derived_kinship(p1, p2, r)
+
+query result

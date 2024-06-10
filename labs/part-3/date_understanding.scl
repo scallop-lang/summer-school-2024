@@ -73,7 +73,7 @@ rel relationship(l1, l2, diff)  = question(question) and extract_relationship(qu
 rel goal(label)                 = question(question) and extract_goal(question, label)
 
 // TODO: Fill in the rules for computing derived_dates from mentioned_dates
-// Hint: Use the "relationship" relation
+// Hint: You can add / subtract Duration values to DateTime values to get a another DateTime 
 type derived_date(label: String, date: DateTime)
 /* YOUR CODE HERE */
 
