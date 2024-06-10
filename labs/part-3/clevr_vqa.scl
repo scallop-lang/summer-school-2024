@@ -10,7 +10,31 @@ type question(question: String)
 
 const size_boundary = 50000
 
-// ==== Foundation Models ====
+// ==== Foundation Model for Processing Natural Language Question ====
+
+@gpt(
+  header="Please convert a question into its programmatic form according to the following language
+
+Expr := Scene() | FilterShape(Expr, String) | FilterMaterial(Expr, String) | FilterColor(Expr, String) | Count(Expr) | Exists(Expr) | GreaterThan(Expr, Expr) | LessThan(Expr, Expr) | Equals(Expr, Expr) | And(Expr, Expr) | Or(Expr, Expr) | SameSize(Expr) | SameColor(Expr) | SameMaterial(Expr) | SameShape(Expr)
+
+Please pick shapes among \"cylinder\", \"cube\", and \"sphere\";
+Colors are among \"red\", \"blue\", 'yellow\", and \"green\";
+Materials are among \"shiny metal\", \"solid rubber\";
+Sizes are among \"large\", \"small\".
+  ",
+  prompt="Question: {{s}}\nQuery: {{e}}",
+  examples=[
+    ("How many red objects are there?", "Count(FilterColor(Scene(), \"red\"))"),
+    ("Is there a cube?", "Exists(FilterShape(Scene(), \"cube\"))"),
+    ("Is there more red objects than blue objects?", "GreaterThan(Count(FilterColor(Scene(), \"red\")), Count(FilterColor(Scene(), \"blue\")))"),
+    ("Count the objects having the same size as the blue cube.", "Count(SameSize(FilterShape(FilterColor(Scene(), \"blue\"), \"cube\")))")
+  ],
+  model="gpt-4",
+  debug=true
+)
+type parse_expr(bound s: String, e: Entity)
+
+// ==== Foundation Models for Parsing Image into Scene Graph ====
 
 @owl_vit(
   object_queries=["cube", "sphere", "cylinder"],
@@ -43,28 +67,6 @@ type classify_color(bound img: Tensor, color: String)
 /* YOUR CODE HERE */
 type classify_material(bound img: Tensor, material: String)
 
-@gpt(
-  header="Please convert a question into its programmatic form according to the following language
-
-Expr := Scene() | FilterShape(Expr, String) | FilterMaterial(Expr, String) | FilterColor(Expr, String) | Count(Expr) | Exists(Expr) | GreaterThan(Expr, Expr) | LessThan(Expr, Expr) | Equals(Expr, Expr) | And(Expr, Expr) | Or(Expr, Expr) | SameSize(Expr) | SameColor(Expr) | SameMaterial(Expr) | SameShape(Expr)
-
-Please pick shapes among \"cylinder\", \"cube\", and \"sphere\";
-Colors are among \"red\", \"blue\", 'yellow\", and \"green\";
-Materials are among \"shiny metal\", \"solid rubber\";
-Sizes are among \"large\", \"small\".
-  ",
-  prompt="Question: {{s}}\nQuery: {{e}}",
-  examples=[
-    ("How many red objects are there?", "Count(FilterColor(Scene(), \"red\"))"),
-    ("Is there a cube?", "Exists(FilterShape(Scene(), \"cube\"))"),
-    ("Is there more red objects than blue objects?", "GreaterThan(Count(FilterColor(Scene(), \"red\")), Count(FilterColor(Scene(), \"blue\")))"),
-    ("Count the objects having the same size as the blue cube.", "Count(SameSize(FilterShape(FilterColor(Scene(), \"blue\"), \"cube\")))")
-  ],
-  model="gpt-4",
-  debug=true
-)
-type parse_expr(bound s: String, e: Entity)
-
 // ==== Image Processing ====
 
 rel num_obj = {10}
@@ -81,7 +83,7 @@ rel size_val(obj, size) = object_segment(obj, obj_img, size) //for debug purpose
 rel size(obj, "large") = object_segment(obj, obj_img, size) and size >= size_boundary
 rel size(obj, "small") = object_segment(obj, obj_img, size) and size <= size_boundary
 
-// ==== Semantic Parsing ====
+// ==== Semantic Parsing and Evaluating Scene Graph Query Language ====
 
 // Declare object with filters
 
