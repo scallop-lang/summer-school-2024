@@ -23,3 +23,6 @@ export OPENAI_API_KEY="<YOUR_OPENAI_KEY>"
 
 ## Tutorial instructions
 See the [official website](https://www.scallop-lang.org/ssnp24/index.html).
+
+## Solutions
+See the `solutions` branch.
