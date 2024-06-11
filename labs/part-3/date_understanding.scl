@@ -73,9 +73,11 @@ rel relationship(l1, l2, diff)  = question(question) and extract_relationship(qu
 rel goal(label)                 = question(question) and extract_goal(question, label)
 
 // TODO: Fill in the rules for computing derived_dates from mentioned_dates
-// Hint: You can add / subtract Duration values to DateTime values to get a another DateTime 
+// Hint: You can add / subtract Duration values to DateTime values to get another DateTime 
 type derived_date(label: String, date: DateTime)
-/* YOUR CODE HERE */
+rel derived_date(label, date)        = mentioned_date(label, date)
+rel derived_date(label, date - diff) = relationship(label, other, diff) and derived_date(other, date)
+rel derived_date(label, date + diff) = relationship(other, label, diff) and derived_date(other, date)
 
 // Get the answer corresponding to the goal
 rel answer(date) = goal(label) and derived_date(label, date)

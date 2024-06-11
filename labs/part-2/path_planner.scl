@@ -14,32 +14,36 @@ type Action = UP | RIGHT | DOWN | LEFT
 // ** Problem 1: safe_node **
 // (x, y) is a safe node if it is a grid node and does not contain an enemy
 type safe_node(x: usize, y: usize)
-/* YOUR CODE HERE */
+rel safe_node(x, y) = grid_node(x, y), not enemy(x, y)
 
 // ** Problem 2: edge **
 // There is an (safe) edge between safe nodes (x1, y1) and (x2, y2) if
 // taking the action `a` can move the actor from (x1, y1) to (x2, y2)
 type edge(x1: usize, y1: usize, x2: usize, y2: usize, a: Action)
-/* YOUR CODE HERE */
+rel edge(x, y, x, y + 1, UP) = safe_node(x, y), safe_node(x, y + 1)
+rel edge(x, y, x + 1, y, RIGHT) = safe_node(x, y), safe_node(x + 1, y)
+rel edge(x, y, x, y - 1, DOWN) = safe_node(x, y), safe_node(x, y - 1)
+rel edge(x, y, x - 1, y, LEFT) = safe_node(x, y), safe_node(x - 1, y)
 
 // ** Problem 3: path **
 // There is a (safe) path between safe nodes (x1, y1) and (x2, y2) if
 // there is a series of safe edges connecting the two nodes.
 // Note that self-path is also a safe path.
 type path(x1: usize, y1: usize, x2: usize, y2: usize)
-/* YOUR CODE HERE */
+rel path(x, y, x, y) = safe_node(x, y)
+rel path(x1, y1, x3, y3) = path(x1, y1, x2, y2), edge(x2, y2, x3, y3, _)
 
 // ** Problem 4: next_position **
 // Given the current actor position, taking the action `a` would move the
 // actor to the position (x, y)
 type next_position(a: Action, x: usize, y: usize)
-/* YOUR CODE HERE */
+rel next_position(a, x2, y2) = actor(x1, y1), edge(x1, y1, x2, y2, a)
 
 // ** Problem 5: next_position **
 // We pick the action `a` as the next action if, after moving to the next
 // position with `a`, we have a safe path from the next position to the goal
 type next_action(a: Action)
-/* YOUR CODE HERE */
+rel next_action(a) = next_position(a, x1, y1), goal(x2, y2), path(x1, y1, x2, y2)
 
 // =========== YOUR CODE END HERE ===========
 

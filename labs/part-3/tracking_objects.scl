@@ -21,7 +21,26 @@ query gpt_ans
 //      (initial) possessions:  ("Alice", "orange ball"), ("Bob", "white ball"), ("Claire", "blue ball")
 //      swaps:                  (1, "Alice", "Bob"), (2, "Bob", "Claire"), (3, "Alice", "Bob")
 //      goal:                   ("Alice")
-/* YOUR CODE HERE */
+@gpt_extract_info(
+  header="Please extract the relationships from the provided question.",
+  prompts=[
+    "What are the initial possessions in JSON format? (use 'person' and 'object' as fields)",
+    "What are the swaps in JSON format?",
+    "Who is the goal in JSON format?"
+  ],
+  examples=[
+    (
+      ["Alice, Bob, and Claire are playing a game. At the start of the game, they are each holding a ball: Alice has a orange ball, Bob has a white ball, and Claire has a blue ball. As the game progresses, pairs of players trade balls. First, Alice and Bob swap balls. Then, Bob and Claire swap balls. Finally, Alice and Bob swap balls. At the end of the game, Alice has the"],
+      [
+        [("Alice", "orange ball"), ("Bob", "white ball"), ("Claire", "blue ball")],
+        [("1", "Alice", "Bob"), ("2", "Bob", "Claire"), ("3", "Alice", "Bob")],
+        [("Alice")]
+      ]
+    )
+  ],
+  model="gpt-4",
+  debug=true,
+)
 type extract_possessions (bound question: String, person: String, object: String),
      extract_swaps       (bound question: String, time: i32, person_a: String, person_b: String),
      extract_goal        (bound question: String, goal: String)
@@ -31,13 +50,19 @@ type extract_possessions (bound question: String, person: String, object: String
 type possessions(t: i32, person: String, object: String)
 type swaps(t: i32, person_a: String, person_b: String)
 type goal(person: String)
-/* YOUR CODE HERE */
+rel possessions(1, person, object) = question(question) and extract_possessions(question, person, object)
+rel swaps(time, p1, p2) = question(question) and extract_swaps(question, time, p1, p2)
+rel goal(person) = question(question) and extract_goal(question, person)
 
 // TODO:    Write the rules for computing the answer from possessions, swaps, and goal
 // Hint 1:  Let the possession fact (t, person, object) represent a person's state at time step t,
 //          which is the result of applying all swaps before the swap at time t
 // Hint 2:  Consider possession fact (t + 1, goal_person, object), where t is the max time step among extracted swaps
 type answer(object: String)
-/* YOUR CODE HERE */
+rel swaps(time, p1, p2) = swaps(time, p2, p1)
+rel possessions(t + 1, p1, object) = swaps(t, p1, p2) and possessions(t, p2, object)
+rel possessions(t + 1, p1, object) = swaps(t, _, _) and not swaps(t, p1, _) and possessions(t, p1, object)
+rel final_time(t + 1) = t := max(t: swaps(t, _, _))
+rel answer(object) = goal(person) and possessions(t, person, object) and final_time(t)
 
 query answer
